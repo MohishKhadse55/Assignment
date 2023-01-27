@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            #myForm {
+                width: 300px;
+                padding: 20px;
+                border: 1px solid #ccc;
+                margin: 0 auto;
+            }
+
+            label {
+                font-weight: bold;
+                margin-right: 10px;
+            }
+
+            input[type="text"] {
+                padding: 10px;
+                width: 90%;
+                margin-bottom: 20px;
+                border: 1px solid #ccc;
+            }
+
+            #saveButton {
+                background-color: #4caf50;
+                color: white;
+                padding: 12px 10px;
+                border: none;
+                cursor: pointer;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            th,
+            td {
+                border: 1px solid #ccc;
+                padding: 8px;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f2f2f2;
+            }
+            .searchBox {
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <form id="myForm">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required />
+            <br />
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required />
+            <br />
+            <label for="contactNumber">Contact Number:</label>
+            <input
+                type="text"
+                id="contactNumber"
+                name="contactNumber"
+                required />
+            <br /><br />
+            <button type="button" id="saveButton">Save</button>
+
+            <table id="myTable">
+                <thead>
+                    <tr>
+                        <th id="namesort">Name</th>
+                        <th>Contact Number</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="searchBox">
+                <input type="text" id="search" placeholder="Search by name" />
+                <button type="button" id="searchButton">Search</button>
+            </div>
+        </form>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $("#namesort").click(function (e) {
+                    e.preventDefault();
+                    var table = $("#myTable");
+                    var rows = $("tbody tr", table);
+                    rows.sort(function (a, b) {
+                        var keyA = $("td:first", a).text();
+                        var keyB = $("td:first", b).text();
+                        if (keyA < keyB) return -1;
+                        if (keyA > keyB) return 1;
+                        return 0;
+                    });
+                    $.each(rows, function (index, row) {
+                        table.append(row);
+                    });
+                });
+            });
+
+            $(document).ready(function () {
+                $("#searchButton").click(function (e) {
+                    e.preventDefault();
+                    var searchValue = $("#search").val();
+                    $("#myTable tbody tr").each(function () {
+                        var name = $(this).find("td:first").text();
+                        if (
+                            name
+                                .toLowerCase()
+                                .indexOf(searchValue.toLowerCase()) == -1
+                        ) {
+                            $(this).hide();
+                        } else {
+                            $(this).show();
+                        }
+                    });
+                });
+            });
+
+            $(document).ready(function () {
+                $("#saveButton").click(function (e) {
+                    e.preventDefault();
+                    var firstName = $("#firstName").val();
+                    var lastName = $("#lastName").val();
+                    var contactNumber = $("#contactNumber").val();
+                    var name = firstName + " " + lastName;
+                    var checkName = true;
+                    var checkNumber = true;
+                    $("#myTable tbody tr").each(function () {
+                        var tableName = $(this).find("td:first").text();
+                        var tableNumber = $(this)
+                            .find("td:nth-child(2)")
+                            .text();
+                        if (tableName == name) {
+                            checkName = false;
+                            return false;
+                        }
+                        if (tableNumber == contactNumber) {
+                            checkNumber = false;
+                            return false;
+                        }
+                    });
+                    if (checkName && checkNumber) {
+                        $("#myTable tbody").append(
+                            "<tr><td>" +
+                                name +
+                                "</td><td>" +
+                                contactNumber +
+                                '</td><td><button class="delete-row">x</button></td></tr>'
+                        );
+                    } else {
+                        if (!checkName) alert("Name already exists");
+                        if (!checkNumber)
+                            alert("Contact number already exists");
+                    }
+                });
+                $("#myTable").on("click", ".delete-row", function () {
+                    $(this).closest("tr").remove();
+                });
+            });
+        </script>
+    </body>
+</html>
